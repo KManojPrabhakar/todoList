@@ -164,7 +164,8 @@ var AppService = /** @class */ (function () {
     function AppService(http) {
         var _this = this;
         this.http = http;
-        this.url = 'http://localhost:3000';
+        // private url =  'http://localhost:3000';
+        this.url = 'http://todolist-backend.testmanoj.com';
         this.allCountryNames = 'https://restcountries.eu/rest/v2/all';
         this.countryNameUrl = 'http://country.io/names.json';
         this.countryPhoneUrl = 'http://country.io/phone.json';
@@ -323,7 +324,7 @@ var ListViewComponent = /** @class */ (function () {
                 //  this.toastr.error("please enter the list name")
             }
             else {
-                alert("userId" + _this.userId);
+                //  alert("userId"+this.userId);
                 var data = {
                     listName: _this.listName,
                     userId: _this.userId
