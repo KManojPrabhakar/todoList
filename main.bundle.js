@@ -222,6 +222,25 @@ var AppService = /** @class */ (function () {
             .set('userId', data.userId);
         return this.http.post(this.url + "/api/v1/todolist/createList", params);
     };
+    AppService.prototype.editListFunction = function (data) {
+        var params = new __WEBPACK_IMPORTED_MODULE_6__angular_common_http__["c" /* HttpParams */]()
+            .set('listName', data.listName);
+        return this.http.post(this.url + "/api/v1/todolist/:userId/:listId/editList", params);
+    };
+    AppService.prototype.deleteListFunction = function (userId, listId) {
+        var params = new __WEBPACK_IMPORTED_MODULE_6__angular_common_http__["c" /* HttpParams */]();
+        return this.http.post(this.url + "/api/v1/todolist/" + userId + "/" + listId + "/deleteList", params);
+    };
+    AppService.prototype.sentFriendRequest = function (data) {
+        var params = new __WEBPACK_IMPORTED_MODULE_6__angular_common_http__["c" /* HttpParams */]()
+            .set('email', data.friendEmail);
+        return this.http.post(this.url + "/api/v1/todolist/" + data.userId + "/" + data.listId + "/sentFriendRequest", params);
+    }; // end of sentFriendRequest function.
+    AppService.prototype.acceptRequest = function (data) {
+        var params = new __WEBPACK_IMPORTED_MODULE_6__angular_common_http__["c" /* HttpParams */]()
+            .set('friendRequestId', data.friendRequestId);
+        return this.http.post(this.url + "/api/v1/todolist/acceptFriend", params);
+    }; // end of resetFunction .
     AppService.prototype.getAllLists = function (userId) {
         return this.http.get(this.url + "/api/v1/todolist/getAllLists/" + userId);
     };
@@ -247,17 +266,106 @@ var AppService = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/app/todo-list/accept-friend-request/accept-friend-request.component.css":
+/***/ (function(module, exports) {
+
+module.exports = ""
+
+/***/ }),
+
+/***/ "./src/app/todo-list/accept-friend-request/accept-friend-request.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "<nav class=\"navbar navbar-expand-md navbar-dark bg-dark\">\r\n\r\n  <a class=\"navbar-brand\" href=\"/\">To Do List</a>\r\n\r\n  <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarSupportedContent\" aria-controls=\"navbarSupportedContent\"\r\n    aria-expanded=\"false\" aria-label=\"Toggle navigation\">\r\n\r\n    <span class=\"navbar-toggler-icon\"></span>\r\n\r\n  </button>\r\n\r\n  <div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\">\r\n\r\n    <ul class=\"navbar-nav\">\r\n\r\n      <!--<li class=\"nav-item\">\r\n\r\n        <a class=\"nav-link\" (click)=\"goToSignUp()\">Sign-Up</a>\r\n\r\n      </li>-->\r\n\r\n    </ul>\r\n\r\n  </div>\r\n\r\n</nav>\r\n\r\n<div class=\"row p-0 m-0\">\r\n\r\n  <div class=\"col-sm\"></div>\r\n\r\n  <div class=\"col-sm p-5\">\r\n\r\n   \r\n\r\n\r\n\r\n\r\n    <br>\r\n\r\n\r\n\r\n\r\n\r\n    <button class=\"btn btn-lg btn-primary btn-block\" type=\"button\" (click)=\"acceptRequest()\">Accept Request</button>\r\n\r\n  </div>\r\n\r\n  <div class=\"col-sm\"></div>\r\n\r\n</div>\r\n"
+
+/***/ }),
+
+/***/ "./src/app/todo-list/accept-friend-request/accept-friend-request.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AcceptFriendRequestComponent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("./node_modules/@angular/router/esm5/router.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_service__ = __webpack_require__("./src/app/app.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ng2_toastr_ng2_toastr__ = __webpack_require__("./node_modules/ng2-toastr/ng2-toastr.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ng2_toastr_ng2_toastr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_ng2_toastr_ng2_toastr__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var AcceptFriendRequestComponent = /** @class */ (function () {
+    function AcceptFriendRequestComponent(appService, router, toastr, _route, vcr) {
+        var _this = this;
+        this.appService = appService;
+        this.router = router;
+        this.toastr = toastr;
+        this._route = _route;
+        //  let resetPasswordToken = this._route.snapshot.paramMap.get('token');
+        this.acceptRequest = function () {
+            var that = _this;
+            var friendRequestId = _this._route.snapshot.paramMap.get('friendRequestId');
+            var data = {
+                friendRequestId: friendRequestId
+            };
+            _this.appService.acceptRequest(data)
+                .subscribe(function (apiResponse) {
+                if (apiResponse.status === 200) {
+                    _this.toastr.success("your  Accepted Requested ");
+                    setTimeout(function () {
+                        that.router.navigate(['/list-view']);
+                    }, 1000);
+                }
+                else {
+                    _this.toastr.error(apiResponse.message);
+                }
+            }, function (err) {
+                _this.toastr.error("some error occured");
+            });
+        };
+        this.toastr.setRootViewContainerRef(vcr);
+    }
+    AcceptFriendRequestComponent.prototype.ngOnInit = function () {
+    };
+    AcceptFriendRequestComponent = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+            selector: 'app-accept-friend-request',
+            template: __webpack_require__("./src/app/todo-list/accept-friend-request/accept-friend-request.component.html"),
+            styles: [__webpack_require__("./src/app/todo-list/accept-friend-request/accept-friend-request.component.css")]
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__app_service__["a" /* AppService */],
+            __WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* Router */],
+            __WEBPACK_IMPORTED_MODULE_3_ng2_toastr_ng2_toastr__["ToastsManager"],
+            __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* ActivatedRoute */],
+            __WEBPACK_IMPORTED_MODULE_0__angular_core__["ViewContainerRef"]])
+    ], AcceptFriendRequestComponent);
+    return AcceptFriendRequestComponent;
+}());
+
+
+
+/***/ }),
+
 /***/ "./src/app/todo-list/list-view/list-view.component.css":
 /***/ (function(module, exports) {
 
-module.exports = ".online{\r\n\r\n  height: 10px;\r\n  width: 10px;\r\n  background-color:green;\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n}\r\n\r\n.offline{\r\n\r\n  height: 10px;\r\n  width: 10px;\r\n  background-color:red;\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n}\r\n\r\n.rightSideClass {\r\n    float: right;\r\n    background: #ddd;\r\n    border-radius: 0.5em;\r\n  }\r\n\r\n.leftSideClass {\r\n    float: left;\r\n    background: #55C1E7;\r\n    border-radius: 0.5em;\r\n  }\r\n\r\n.circle-green:before {\r\n    content: ' \\25CF';\r\n    font-size: 1em;\r\n    color: green;\r\n  }\r\n\r\n.circle-red:before {\r\n    content: ' \\25CF';\r\n    font-size: 1em;\r\n    color: red;\r\n  }\r\n\r\n.cursorPointer {\r\n    cursor: pointer;\r\n  }\r\n\r\n.textCenter {\r\n    text-align: center;\r\n  }\r\n\r\n.floatLeft {\r\n    float: left;\r\n  }\r\n\r\n*,\r\n  *:before,\r\n  *:after {\r\n    -webkit-box-sizing: border-box;\r\n    box-sizing: border-box;\r\n  }\r\n\r\nbody {\r\n    padding: 2.5em 0;\r\n    color: white;\r\n  }\r\n\r\n.container {\r\n    margin: 0 auto;\r\n    background: #444753;\r\n    border-radius: 0.3em;\r\n  }\r\n\r\n.people-list {\r\n    float: left;\r\n  }\r\n\r\n.people-list input {\r\n    border-radius: 0.2em;\r\n    border: none;\r\n    padding: 1em;\r\n    color: white;\r\n    background: #6A6C75;\r\n    width: 90%;\r\n    font-size: 1em;\r\n  }\r\n\r\n.people-list .fa-search {\r\n    position: relative;\r\n    left: -1.8em;\r\n  }\r\n\r\n.people-list ul {\r\n    padding: 0;\r\n  }\r\n\r\n.people-list ul li .userPresence {\r\n    float: left;\r\n    padding: 0.7em 0.2em;\r\n    color: white;\r\n    text-transform: capitalize;\r\n  }\r\n\r\n.textCapitalize {\r\n    text-transform: capitalize;\r\n    font-size: 1.2em;\r\n  }\r\n\r\n.people-list img {\r\n    float: left;\r\n  }\r\n\r\n.people-list .about {\r\n    float: left;\r\n  }\r\n\r\n.people-list .about {\r\n    padding-left: 0.4em;\r\n  }\r\n\r\n.people-list .status {\r\n    color: #92959E;\r\n  }\r\n\r\n.chat {\r\n    height: 100vh;\r\n    float: left;\r\n    background: #F2F5F8;\r\n    border-top-right-radius: 0.3em;\r\n    border-bottom-right-radius: 0.3em;\r\n    color: #434651;\r\n  }\r\n\r\n.chat .chat-header {\r\n    padding: 0.2em;\r\n    border-bottom: 0.15em solid white;\r\n  }\r\n\r\n.chat .chat-header img {\r\n    float: left;\r\n  }\r\n\r\n.chat .chat-header .chat-about {\r\n    float: left;\r\n    padding-left: 0.8em;\r\n    margin-top: 0.4em;\r\n  }\r\n\r\n.chat .chat-header .chat-with {\r\n    font-weight: bold;\r\n    font-size: 1.1em;\r\n  }\r\n\r\n.chat .chat-header .chat-num-messages {\r\n    color: #92959E;\r\n  }\r\n\r\n.chat .chat-header .fa-star {\r\n    float: right;\r\n    color: #D8DADF;\r\n    font-size: 1.42em;\r\n    margin-top: 0.85em;\r\n  }\r\n\r\n.chat .chat-history {\r\n    padding: 2em 2em 1.42em;\r\n    border-bottom: 0.15em solid white;\r\n    overflow-y: scroll;\r\n    height: 80vh;\r\n  }\r\n\r\n.chat .chat-history .message-data {\r\n    margin-bottom: 1em;\r\n  }\r\n\r\n.chat .chat-history .message-data-time {\r\n    color: #a8aab1;\r\n    padding-left: 0.4em;\r\n  }\r\n\r\n.chat .chat-history .message {\r\n    color: white;\r\n    padding: 0.5em 1.42em;\r\n    line-height: 1.9em;\r\n    font-size: 1.1em;\r\n    border-radius: 7px;\r\n    margin-bottom: 2em;\r\n    width: 90%;\r\n    position: relative;\r\n  }\r\n\r\n.chat .chat-history .message:after {\r\n    bottom: 100%;\r\n    left: 7%;\r\n    border: solid transparent;\r\n    content: \" \";\r\n    height: 0;\r\n    width: 0;\r\n    position: absolute;\r\n    pointer-events: none;\r\n    border-bottom-color: #86BB71;\r\n    border-width: 0.8em;\r\n    margin-left: -0.8em;\r\n  }\r\n\r\n.chat .chat-history .my-message {\r\n    background: #86BB71;\r\n  }\r\n\r\n.chat .chat-history .other-message {\r\n    background: #94C2ED;\r\n  }\r\n\r\n.chat .chat-history .other-message:after {\r\n    border-bottom-color: #94C2ED;\r\n    left: 90%;\r\n  }\r\n\r\n.chat .chat-message textarea {\r\n    width: 100%;\r\n    border: none;\r\n    padding: 0.8em 1.42em;\r\n    margin-bottom: 0.8em;\r\n    border-radius: 5px;\r\n    resize: none;\r\n  }\r\n\r\n.chat .chat-message .fa-file-o,\r\n  .chat .chat-message .fa-file-image-o {\r\n    font-size: 1.1em;\r\n    color: gray;\r\n    cursor: pointer;\r\n  }\r\n\r\n.chat .chat-message button {\r\n    float: right;\r\n    color: #94C2ED;\r\n    font-size: 1.1em;\r\n    text-transform: uppercase;\r\n    border: none;\r\n    cursor: pointer;\r\n    font-weight: bold;\r\n    background: #F2F5F8;\r\n  }\r\n\r\n.chat .chat-message button:hover {\r\n    color: #75b1e8;\r\n  }\r\n\r\n.online,\r\n  .offline,\r\n  .me,\r\n  .warning {\r\n    margin-right: 3px;\r\n    font-size: 0.8em;\r\n  }\r\n\r\n.online {\r\n    color: #86BB71;\r\n  }\r\n\r\n.offline {\r\n    color: #E38968;\r\n  }\r\n\r\n.me {\r\n    color: #94C2ED;\r\n  }\r\n\r\n.warning {\r\n    color: #e78930;\r\n  }\r\n\r\n.align-left {\r\n    text-align: left;\r\n  }\r\n\r\n.align-right {\r\n    text-align: right;\r\n  }\r\n\r\n.float-right {\r\n    float: right;\r\n  }\r\n\r\n.clearfix:after {\r\n    visibility: hidden;\r\n    display: block;\r\n    font-size: 0;\r\n    content: \" \";\r\n    clear: both;\r\n    height: 0;\r\n  }\r\n\r\n.customButton {\r\n    width: 100%;\r\n  }\r\n\r\n.activeChat {\r\n    background: #393a41;\r\n  }\r\n\r\n.typeOfChats {\r\n    background: #393a41;\r\n    color: white;\r\n    margin-top: 0.2em;\r\n    margin-bottom: 0.2em;\r\n  }\r\n\r\n.blankContent{\r\n    height: 100vh;\r\n    display: -webkit-box;\r\n    display: -ms-flexbox;\r\n    display: flex;\r\n    -webkit-box-align: center;\r\n        -ms-flex-align: center;\r\n            align-items: center;\r\n    -webkit-box-pack: center;\r\n        -ms-flex-pack: center;\r\n            justify-content: center;\r\n    font-size: 1rem;\r\n    color: #999;\r\n  }\r\n\r\n@media only screen and (max-width:575px) {\r\n    .chat .chat-history {\r\n      height:50vh;\r\n    }\r\n    .sent-button {\r\n      margin-top: 90px;\r\n    }\r\n  }\r\n\r\n@media only screen and (min-width:576px) and (max-width:768px) {\r\n    .chat .chat-history {\r\n      height:50vh;\r\n    }\r\n  }\r\n\r\n@media only screen and (min-width:769px) and (max-width:992px) {\r\n    .chat .chat-history {\r\n      height:65vh;\r\n    }\r\n  }\r\n\r\n@media only screen and (min-width:993px) and (max-width:1200  px) {\r\n    .chat .chat-history {\r\n      height:50vh;\r\n    }\r\n  }\r\n\r\n/* user list items */\r\n\r\n.crop {\r\n  border-radius: 100%;\r\n  line-height: 1em;\r\n  padding: 1em;\r\n  text-align: center;\r\n  margin: 0em;\r\n  width: 3em;\r\n  height: 3em;\r\n  float: left;\r\n  text-transform: uppercase;\r\n}\r\n\r\n.about {\r\n  float: left;\r\n  padding-left: 0.4em;\r\n}\r\n\r\n.online,\r\n.offline,\r\n.me,\r\n.warning {\r\n  margin-right: 3px;\r\n  font-size: 0.8em;\r\n}\r\n\r\n.online {\r\n  color: #86BB71;\r\n}\r\n\r\n.offline {\r\n  color: #E38968;\r\n}\r\n\r\n.me {\r\n  color: #94C2ED;\r\n}\r\n\r\n.warning {\r\n  color: #00c8e7;\r\n}\r\n\r\n.status {\r\n  color: #92959E;\r\n}\r\n\r\n.name {\r\n  float: left;\r\n}"
+module.exports = ".online{\r\n\r\n  height: 10px;\r\n  width: 10px;\r\n  background-color:green;\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n}\r\n\r\n.offline{\r\n\r\n  height: 10px;\r\n  width: 10px;\r\n  background-color:red;\r\n  border-radius: 50%;\r\n  display: inline-block;\r\n}\r\n\r\n.rightSideClass {\r\n    float: right;\r\n    background: #ddd;\r\n    border-radius: 0.5em;\r\n  }\r\n\r\n.leftSideClass {\r\n    float: left;\r\n    background: #55C1E7;\r\n    border-radius: 0.5em;\r\n  }\r\n\r\n.circle-green:before {\r\n    content: ' \\25CF';\r\n    font-size: 1em;\r\n    color: green;\r\n  }\r\n\r\n.circle-red:before {\r\n    content: ' \\25CF';\r\n    font-size: 1em;\r\n    color: red;\r\n  }\r\n\r\n.cursorPointer {\r\n    cursor: pointer;\r\n  }\r\n\r\n.textCenter {\r\n    text-align: center;\r\n  }\r\n\r\n.floatLeft {\r\n    float: left;\r\n  }\r\n\r\n*,\r\n  *:before,\r\n  *:after {\r\n    -webkit-box-sizing: border-box;\r\n    box-sizing: border-box;\r\n  }\r\n\r\nbody {\r\n    padding: 2.5em 0;\r\n    color: white;\r\n  }\r\n\r\n.container {\r\n    margin: 0 auto;\r\n    background: #444753;\r\n    border-radius: 0.3em;\r\n  }\r\n\r\n.people-list {\r\n    float: left;\r\n  }\r\n\r\n.people-list input {\r\n    border-radius: 0.2em;\r\n    border: none;\r\n    padding: 1em;\r\n    color: white;\r\n    background: #6A6C75;\r\n    width: 90%;\r\n    font-size: 1em;\r\n  }\r\n\r\n.people-list .fa-search {\r\n    position: relative;\r\n    left: -1.8em;\r\n  }\r\n\r\n.people-list ul {\r\n    padding: 0;\r\n  }\r\n\r\n.people-list ul li .userPresence {\r\n    float: left;\r\n    padding: 0.7em 0.2em;\r\n    color: white;\r\n    text-transform: capitalize;\r\n  }\r\n\r\n.textCapitalize {\r\n    text-transform: capitalize;\r\n    font-size: 1.2em;\r\n  }\r\n\r\n.people-list img {\r\n    float: left;\r\n  }\r\n\r\n.people-list .about {\r\n    float: left;\r\n  }\r\n\r\n.people-list .about {\r\n    padding-left: 0.4em;\r\n  }\r\n\r\n.people-list .status {\r\n    color: #92959E;\r\n  }\r\n\r\n.chat {\r\n    height: 100vh;\r\n    float: left;\r\n    background: #F2F5F8;\r\n    border-top-right-radius: 0.3em;\r\n    border-bottom-right-radius: 0.3em;\r\n    color: #434651;\r\n  }\r\n\r\n.chat .chat-header {\r\n    padding: 0.2em;\r\n    border-bottom: 0.15em solid white;\r\n  }\r\n\r\n.chat .chat-header img {\r\n    float: left;\r\n  }\r\n\r\n.chat .chat-header .chat-about {\r\n    float: left;\r\n    padding-left: 0.8em;\r\n    margin-top: 0.4em;\r\n  }\r\n\r\n.chat .chat-header .chat-with {\r\n    font-weight: bold;\r\n    font-size: 1.1em;\r\n  }\r\n\r\n.chat .chat-header .chat-num-messages {\r\n    color: #92959E;\r\n  }\r\n\r\n.chat .chat-header .fa-star {\r\n    float: right;\r\n    color: #D8DADF;\r\n    font-size: 1.42em;\r\n    margin-top: 0.85em;\r\n  }\r\n\r\n.chat .chat-history {\r\n    padding: 2em 2em 1.42em;\r\n    border-bottom: 0.15em solid white;\r\n    overflow-y: scroll;\r\n    height: 80vh;\r\n  }\r\n\r\n.chat .chat-history .message-data {\r\n    margin-bottom: 1em;\r\n  }\r\n\r\n.chat .chat-history .message-data-time {\r\n    color: #a8aab1;\r\n    padding-left: 0.4em;\r\n  }\r\n\r\n.chat .chat-history .message {\r\n    color: white;\r\n    padding: 0.5em 1.42em;\r\n    line-height: 1.9em;\r\n    font-size: 1.1em;\r\n    border-radius: 7px;\r\n    margin-bottom: 2em;\r\n    width: 90%;\r\n    position: relative;\r\n  }\r\n\r\n.chat .chat-history .message:after {\r\n    bottom: 100%;\r\n    left: 7%;\r\n    border: solid transparent;\r\n    content: \" \";\r\n    height: 0;\r\n    width: 0;\r\n    position: absolute;\r\n    pointer-events: none;\r\n    border-bottom-color: #86BB71;\r\n    border-width: 0.8em;\r\n    margin-left: -0.8em;\r\n  }\r\n\r\n.chat .chat-history .my-message {\r\n    background: #86BB71;\r\n  }\r\n\r\n.chat .chat-history .other-message {\r\n    background: #94C2ED;\r\n  }\r\n\r\n.chat .chat-history .other-message:after {\r\n    border-bottom-color: #94C2ED;\r\n    left: 90%;\r\n  }\r\n\r\n.chat .chat-message textarea {\r\n    width: 100%;\r\n    border: none;\r\n    padding: 0.8em 1.42em;\r\n    margin-bottom: 0.8em;\r\n    border-radius: 5px;\r\n    resize: none;\r\n  }\r\n\r\n.chat .chat-message .fa-file-o,\r\n  .chat .chat-message .fa-file-image-o {\r\n    font-size: 1.1em;\r\n    color: gray;\r\n    cursor: pointer;\r\n  }\r\n\r\n.chat .chat-message button {\r\n    float: right;\r\n    color: #94C2ED;\r\n    font-size: 1.1em;\r\n    text-transform: uppercase;\r\n    border: none;\r\n    cursor: pointer;\r\n    font-weight: bold;\r\n    background: #F2F5F8;\r\n  }\r\n\r\n.chat .chat-message button:hover {\r\n    color: #75b1e8;\r\n  }\r\n\r\n.online,\r\n  .offline,\r\n  .me,\r\n  .warning {\r\n    margin-right: 3px;\r\n    font-size: 0.8em;\r\n  }\r\n\r\n.online {\r\n    color: #86BB71;\r\n  }\r\n\r\n.offline {\r\n    color: #E38968;\r\n  }\r\n\r\n.me {\r\n    color: #94C2ED;\r\n  }\r\n\r\n.warning {\r\n    color: #e78930;\r\n  }\r\n\r\n.align-left {\r\n    text-align: left;\r\n  }\r\n\r\n.align-right {\r\n    text-align: right;\r\n  }\r\n\r\n.float-right {\r\n    float: right;\r\n  }\r\n\r\n.clearfix:after {\r\n    visibility: hidden;\r\n    display: block;\r\n    font-size: 0;\r\n    content: \" \";\r\n    clear: both;\r\n    height: 0;\r\n  }\r\n\r\n.customButton {\r\n    width: 100%;\r\n  }\r\n\r\n.activeChat {\r\n    background: #393a41;\r\n  }\r\n\r\n.typeOfChats {\r\n    background: #393a41;\r\n    color: white;\r\n    margin-top: 0.2em;\r\n    margin-bottom: 0.2em;\r\n  }\r\n\r\n.blankContent{\r\n    height: 100vh;\r\n    display: -webkit-box;\r\n    display: -ms-flexbox;\r\n    display: flex;\r\n    -webkit-box-align: center;\r\n        -ms-flex-align: center;\r\n            align-items: center;\r\n    -webkit-box-pack: center;\r\n        -ms-flex-pack: center;\r\n            justify-content: center;\r\n    font-size: 1rem;\r\n    color: #999;\r\n  }\r\n\r\n.list-edit {\r\n    position: absolute;\r\n    right: 2rem;\r\n    cursor: pointer;\r\n  }\r\n\r\n.list-view-content {\r\n    display: -webkit-box;\r\n    display: -ms-flexbox;\r\n    display: flex;\r\n    position: relative;\r\n    border-bottom: 1px solid grey;\r\n    padding: 5px;\r\n  }\r\n\r\n.list-view-edit-box {\r\n    position: absolute;\r\n    right: 0;\r\n    text-align: left;\r\n    padding: 0 20px;\r\n    z-index: 99;\r\n    top: 33px;\r\n    background: white\r\n  }\r\n\r\n.list-edit-input {\r\n    border: 0;\r\n    outline: 0;\r\n    background: transparent;\r\n  }\r\n\r\n@media only screen and (max-width:575px) {\r\n    .chat .chat-history {\r\n      height:50vh;\r\n    }\r\n    .sent-button {\r\n      margin-top: 90px;\r\n    }\r\n  }\r\n\r\n@media only screen and (min-width:576px) and (max-width:768px) {\r\n    .chat .chat-history {\r\n      height:50vh;\r\n    }\r\n  }\r\n\r\n@media only screen and (min-width:769px) and (max-width:992px) {\r\n    .chat .chat-history {\r\n      height:65vh;\r\n    }\r\n  }\r\n\r\n@media only screen and (min-width:993px) and (max-width:1200  px) {\r\n    .chat .chat-history {\r\n      height:50vh;\r\n    }\r\n  }\r\n\r\n/* user list items */\r\n\r\n.crop {\r\n  border-radius: 100%;\r\n  line-height: 1em;\r\n  padding: 1em;\r\n  text-align: center;\r\n  margin: 0em;\r\n  width: 3em;\r\n  height: 3em;\r\n  float: left;\r\n  text-transform: uppercase;\r\n}\r\n\r\n.about {\r\n  float: left;\r\n  padding-left: 0.4em;\r\n}\r\n\r\n.online,\r\n.offline,\r\n.me,\r\n.warning {\r\n  margin-right: 3px;\r\n  font-size: 0.8em;\r\n}\r\n\r\n.online {\r\n  color: #86BB71;\r\n}\r\n\r\n.offline {\r\n  color: #E38968;\r\n}\r\n\r\n.me {\r\n  color: #94C2ED;\r\n}\r\n\r\n.warning {\r\n  color: #00c8e7;\r\n}\r\n\r\n.status {\r\n  color: #92959E;\r\n}\r\n\r\n.name {\r\n  float: left;\r\n}"
 
 /***/ }),
 
 /***/ "./src/app/todo-list/list-view/list-view.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<!--<nav class=\"navbar navbar-expand-md navbar-dark bg-dark\">\n\n  <a class=\"navbar-brand\" href=\"javascript:void(0)\">To Do List</a>\n\n  <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarSupportedContent\" aria-controls=\"navbarSupportedContent\"\n    aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n\n    <span class=\"navbar-toggler-icon\"></span>\n\n  </button>\n\n  <div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\">\n\n    <ul class=\"navbar-nav\">\n\n      <li class=\"nav-item\">\n\n        <a class=\"nav-link cursorPointer\" (click)=\"goToLogout()\">Log Out</a>\n\n      </li>\n\n    </ul>\n\n  </div>\n\n</nav>-->\n\n<div class=\"container\">\n  <div class=\"row\">\n\n    <div class=\"displayBlockMobile\" style=\"position:fixed;width:100%;z-index:1;\">\n\n      <div class=\"col-sm-12 p-0\">\n\n        <nav class=\"navbar navbar-expand-md navbar-fixed navbar-dark bg-dark\">\n\n          <a class=\"navbar-brand text-white\">\n            {{userName}}\n              <i class=\"fa fa-circle online\" *ngIf=\"disconnectedSocket == false\"></i>\n              <i class=\"fa fa-circle offline\" *ngIf=\"disconnectedSocket == true\"></i>\n            </a>\n\n\n          <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarSupportedContent\" aria-controls=\"navbarSupportedContent\"\n            aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n  \n              <span class=\"navbar-toggler-icon\"></span>\n  \n            </button>\n\n          <div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\">\n\n            <ul class=\"navbar-nav\">\n\n              <li class=\"nav-item\">\n\n                <a class=\"nav-link cursorPointer\" (click)=\"goToLogout()\">Log Out</a>\n\n              </li>\n\n            </ul>\n\n          </div>\n\n          <!--<div class=\"collapse people-list navbar-collapse\" id=\"navbarSupportedContent\">\n  \n              <ul class=\"list\">\n                <li class=\"p-2 typeOfChats\">\n                  Online Users:\n                </li>\n                <li class=\"clearfix cursorPointer\" [ngClass]=\"{'activeChat': user.chatting == true}\" (click)=\"userSelectedToChat(user.userId, user.name)\"\n                  *ngFor=\"let user of userList\">\n                  <div class=\"userPresence\" *ngIf=\"user.userId != userInfo.userId\">\n                    <user-details [userFirstName]=\"user.name\" [userLastName]=\"''\" [userStatus]=\"'online'\" [messageRead]=\"user.unread\"></user-details>\n                  </div>\n                </li>\n                \n              </ul>\n  \n            </div>\n  -->\n        </nav>\n\n      </div>\n\n    </div>\n\n    <div class=\"col-12 displayNoneMobile col-sm-4 col-md-4 people-list p-0\" id=\"people-list\">\n\n      <div class=\"p-3 text-white textCapitalize textCenter\">\n        {{userName}}\n        <i class=\"fa fa-circle online\" *ngIf=\"disconnectedSocket == false\"></i>\n        <i class=\"fa fa-circle offline\" *ngIf=\"disconnectedSocket == true\"></i>\n        <br>\n        <br>\n        <button (click)=\"goToLogout()\" class=\"btn btn-info customButton\">Logout</button>\n      </div>\n\n      <ul class=\"list\">\n        <li class=\"p-2 typeOfChats\">\n          Online Users:\n        </li>\n        <!--<li class=\"clearfix cursorPointer\" [ngClass]=\"{'activeChat': user.chatting == true}\"\n            *ngFor=\"let user of userList\" (click)=\"userSelectedToChat(user.userId, user.name)\">\n            <div class=\"userPresence\" *ngIf=\"user.userId != userInfo.userId\"  >\n              <user-details [userFirstName]=\"user.name\" [userLastName]=\"''\" [userStatus]=\"'online'\" [messageRead]=\"user.unread\"></user-details>\n            </div>\n          </li>-->\n\n      </ul>\n\n\n    </div>\n    <div class=\"col-12 col-sm-8 col-md-8 chat overflow-auto\">\n\n\n      <div class=\"sent-button\">\n        <button (click)=\"showFriendListInputFunction(true)\" type=\"button\" class=\"btn btn-info margin-top-20\">Sent Friend Request</button>\n      </div>\n\n       <div *ngIf=\"showFriendListInput\">\n        <input class=\"margin-top-20\" type=\"email\" required [(ngModel)]=\"friendEmail\" />\n        <div class=\"margin-top-20\">\n          <button type=\"button\" class=\"btn btn-primary btn-sm\" (click)=\"sendFriendRequestToEmail()\">Request</button>\n          <button (click)=\"showFriendListInputFunction(false)\" type=\"button\" class=\"btn btn-secondary btn-sm\">Cancel</button>\n        </div>\n      </div>\n\n      <div>\n        <button (click)=\"showListInputFunction(true)\" type=\"button\" class=\"btn btn-info margin-top-20\">Create New List</button>\n      </div>\n      <div *ngIf=\"showListInputText\">\n        <input class=\"margin-top-20\" type=\"text\" required [(ngModel)]=\"listName\" />\n        <div class=\"margin-top-20\">\n          <button type=\"button\" class=\"btn btn-primary btn-sm\" (click)=\"createListFunction()\">Add List</button>\n          <button (click)=\"showListInputFunction(false)\" type=\"button\" class=\"btn btn-secondary btn-sm\">Cancel</button>\n        </div>\n      </div>\n      <div>\n        <p class=\"margin-top-20\">All Lists</p>\n\n        <p *ngFor=\"let listData of listValues\">{{listData.listName}}</p>\n      </div>\n\n    </div>\n\n    <!--  \n      <div class=\"col-12 col-sm-8 col-md-8 chat\">\n        <div class=\"chat-header clearfix mobileMenu\" *ngIf=\"receiverName\">\n          <first-char [name]=\"receiverName\" [userBg]=\"'blue'\" [userColor]=\"'white'\" (notify)=\"showUserName($event)\"></first-char>\n  \n          <div class=\"chat-about\">\n            <div class=\"chat-with\">Chat with {{receiverName}}</div>\n          </div>\n        </div>\n  \n        <div #scrollMe [scrollTop]=\"(scrollToChatTop)?0:scrollMe.scrollHeight\" class=\"chat-history\" *ngIf=\"receiverName\">\n  \n          <ul>\n            <li class=\"textCenter\" *ngIf=\"receiverName\">\n  \n              <span  class=\"cursorPointer\" (click)=\"loadEarlierPageOfChat()\">Load Previous Chat</span>\n  \n              <br>\n  \n              <span *ngIf=\"loadingPreviousChat == true\">Loading...</span>\n  \n            </li>\n            <li class=\"clearfix\" *ngFor=\"let message of messageList\">\n              <div class=\"message-data\" [ngClass]=\"{'align-right': message.senderId == userInfo.userId}\">\n                <span class=\"message-data-time\">{{message?.createdOn | date: 'medium' }}</span> &nbsp; &nbsp;\n                <span class=\"message-data-name floatLeft\" *ngIf=\"message.senderId != userInfo.userId\">\n                  <i class=\"fa fa-circle online\"></i> {{ message?.senderName }}</span>\n                <span class=\"message-data-name\" *ngIf=\"message.senderId == userInfo.userId\">{{ message?.senderName }}</span>\n                <i class=\"fa fa-circle me\" *ngIf=\"message.senderId == userInfo.userId\"></i>\n  \n              </div>\n              <div class=\"message\" [ngClass]=\"{'float-right other-message': message.senderId == userInfo.userId, 'my-message': message.senderId != userInfo.userId}\">\n                {{message?.message | removeSpecialCharPipe: '#' | removeSpecialCharPipe: '$'}}\n              </div>\n            </li>\n  \n          </ul>\n  \n        </div>\n        <div *ngIf=\"!receiverName\" class=\"col-sm blankContent\">\n          Click on user for start a chat!!!\n        </div>\n  \n        <div class=\"chat-message clearfix p-2\" *ngIf=\"receiverName\">\n          <textarea name=\"message-to-send\" id=\"message-to-send\" (keydown)=\"sendMessageUsingKeypress($event)\" [(ngModel)]=\"messageText\"\n            placeholder=\"Type your message\" rows=\"3\"></textarea>\n  \n          <button (click)=\"sendMessage()\">Send</button>\n  \n        </div>\n  \n      </div>-->\n\n  </div>\n  <!-- end chat -->\n\n</div>\n<!-- end container -->"
+module.exports = "<!--<nav class=\"navbar navbar-expand-md navbar-dark bg-dark\">\n\n  <a class=\"navbar-brand\" href=\"javascript:void(0)\">To Do List</a>\n\n  <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarSupportedContent\" aria-controls=\"navbarSupportedContent\"\n    aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n\n    <span class=\"navbar-toggler-icon\"></span>\n\n  </button>\n\n  <div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\">\n\n    <ul class=\"navbar-nav\">\n\n      <li class=\"nav-item\">\n\n        <a class=\"nav-link cursorPointer\" (click)=\"goToLogout()\">Log Out</a>\n\n      </li>\n\n    </ul>\n\n  </div>\n\n</nav>-->\n\n<div class=\"container\">\n\t<div class=\"row\">\n\n\t\t<div class=\"displayBlockMobile\" style=\"position:fixed;width:100%;z-index:1;\">\n\n\t\t\t<div class=\"col-sm-12 p-0\">\n\n\t\t\t\t<nav class=\"navbar navbar-expand-md navbar-fixed navbar-dark bg-dark\">\n\n\t\t\t\t\t<a class=\"navbar-brand text-white\">\n            {{userName}}\n              <i class=\"fa fa-circle online\" *ngIf=\"disconnectedSocket == false\"></i>\n              <i class=\"fa fa-circle offline\" *ngIf=\"disconnectedSocket == true\"></i>\n            </a>\n\n\n\t\t\t\t\t<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarSupportedContent\" aria-controls=\"navbarSupportedContent\"\n\t\t\t\t\t aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n  \n              <span class=\"navbar-toggler-icon\"></span>\n  \n            </button>\n\n\t\t\t\t\t<div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\">\n\n\t\t\t\t\t\t<ul class=\"navbar-nav\">\n\n\t\t\t\t\t\t\t<li class=\"nav-item\">\n\n\t\t\t\t\t\t\t\t<a class=\"nav-link cursorPointer\" (click)=\"goToLogout()\">Log Out</a>\n\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t</ul>\n\n\t\t\t\t\t</div>\n\n\t\t\t\t\t<!--<div class=\"collapse people-list navbar-collapse\" id=\"navbarSupportedContent\">\n  \n              <ul class=\"list\">\n                <li class=\"p-2 typeOfChats\">\n                  Online Users:\n                </li>\n                <li class=\"clearfix cursorPointer\" [ngClass]=\"{'activeChat': user.chatting == true}\" (click)=\"userSelectedToChat(user.userId, user.name)\"\n                  *ngFor=\"let user of userList\">\n                  <div class=\"userPresence\" *ngIf=\"user.userId != userInfo.userId\">\n                    <user-details [userFirstName]=\"user.name\" [userLastName]=\"''\" [userStatus]=\"'online'\" [messageRead]=\"user.unread\"></user-details>\n                  </div>\n                </li>\n                \n              </ul>\n  \n            </div>\n  -->\n\t\t\t\t</nav>\n\n\t\t\t</div>\n\n\t\t</div>\n\n\t\t<div class=\"col-12 displayNoneMobile col-sm-4 col-md-4 people-list p-0\" id=\"people-list\">\n\n\t\t\t<div class=\"p-3 text-white textCapitalize textCenter\">\n\t\t\t\t{{userName}}\n\t\t\t\t<i class=\"fa fa-circle online\" *ngIf=\"disconnectedSocket == false\"></i>\n\t\t\t\t<i class=\"fa fa-circle offline\" *ngIf=\"disconnectedSocket == true\"></i>\n\t\t\t\t<br>\n\t\t\t\t<br>\n\t\t\t\t<button (click)=\"goToLogout()\" class=\"btn btn-info customButton\">Logout</button>\n\t\t\t</div>\n\n\t\t\t<ul class=\"list\">\n\t\t\t\t<li class=\"p-2 typeOfChats\">\n\t\t\t\t\tOnline Users:\n\t\t\t\t</li>\n\t\t\t\t<!--<li class=\"clearfix cursorPointer\" [ngClass]=\"{'activeChat': user.chatting == true}\"\n            *ngFor=\"let user of userList\" (click)=\"userSelectedToChat(user.userId, user.name)\">\n            <div class=\"userPresence\" *ngIf=\"user.userId != userInfo.userId\"  >\n              <user-details [userFirstName]=\"user.name\" [userLastName]=\"''\" [userStatus]=\"'online'\" [messageRead]=\"user.unread\"></user-details>\n            </div>\n          </li>-->\n\n\t\t\t</ul>\n\n\n\t\t</div>\n\t\t<div class=\"col-12 col-sm-8 col-md-8 chat overflow-auto\">\n\n\n\t\t\t<!--<div class=\"sent-button\">\n\t\t\t\t<button (click)=\"showFriendListInputFunction(true)\" type=\"button\" class=\"btn btn-info margin-top-20\">Sent Friend Request</button>\n\t\t\t</div>\n\n\t\t\t<div *ngIf=\"showFriendListInput\">\n\t\t\t\t<input class=\"margin-top-20\" type=\"email\" required [(ngModel)]=\"friendEmail\" />\n\t\t\t\t<div class=\"margin-top-20\">\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-sm\" (click)=\"sendFriendRequestToEmail()\">Request</button>\n\t\t\t\t\t<button (click)=\"showFriendListInputFunction(false)\" type=\"button\" class=\"btn btn-secondary btn-sm\">Cancel</button>\n\t\t\t\t</div>\n\t\t\t</div>-->\n\n\t\t\t<div>\n\t\t\t\t<button (click)=\"showListInputFunction(true)\" type=\"button\" class=\"btn btn-info margin-top-20\">Create New List</button>\n\t\t\t</div>\n\t\t\t<div *ngIf=\"showListInputText\">\n\t\t\t\t<input class=\"margin-top-20\" type=\"text\" required [(ngModel)]=\"listName\" />\n\t\t\t\t<div class=\"margin-top-20\">\n\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-sm\" (click)=\"createListFunction()\">Add List</button>\n\t\t\t\t\t<button (click)=\"showListInputFunction(false)\" type=\"button\" class=\"btn btn-secondary btn-sm\">Cancel</button>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t\n\t\t\t<p class=\"margin-top-20\">All Lists</p>\n\n\t\t\t<div *ngFor=\"let listData of listValues;let i = index\" class=\"list-view-content\">\n\t\t\t\t<!--<div *ngIf=\"(i == showEditInputValue) && !showEditedInputvalue\">-->\n\n\t\t\t\t\t<input class=\"list-edit-input\" type=\"text\" value={{listData.listName}} readonly/>\n\t\t\t\t\t<div class=\"list-edit\" (click)=\"showEditBoxFunction(i)\">...</div>\n\t\t\t\t\t<div *ngIf=\"(i == showEditBoxValue) && showEditBox\" class=\"list-view-edit-box\">\n\t\t\t\t\t\t<div (click)=\"showShareInputFunction(true)\"  class=\"cursorPointer\">Share </div>\n\t\t\t\t\t\t<div *ngIf=\"showShareInput\">\n\t\t\t\t\t\t\t<input class=\"margin-top-20\" type=\"text\" required [(ngModel)]=\"shareEmail\" />\n\t\t\t\t\t\t\t<div class=\"margin-top-20\">\n\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-sm\" (click)=\"sentFriendRequest(listData)\">Sent</button>\n\t\t\t\t\t\t\t\t<button (click)=\"showShareInputFunction(false)\" type=\"button\" class=\"btn btn-secondary btn-sm\">Cancel</button>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<!--<div (click)=\"editListInputFunction(index)\" class=\"cursorPointer\">Edit</div>\n\t\t\t\t\t\t<div>Create items in list</div>-->\n\t\t\t\t\t\t<div (click)=\"deleteListNameFunction(listData)\" class=\"cursorPointer\">Delete</div>\n\t\t\t\t\t\t<div (click)=\"cancelEditBoxFunction()\" class=\"cursorPointer\">Cancel</div>\n\n\t\t\t\t\t<!--</div>-->\n\t\t\t\t</div>\n\n\t\t\t\t<div *ngIf=\"(i == showEditInputValue) && showEditedInputvalue\">\n\t\t\t\t\t<input class=\"margin-top-20\" type=\"text\" value={{listData.listName}} required [(ngModel)]=\"listEditName\" />\n\t\t\t\t\t<div class=\"margin-top-20\">\n\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary btn-sm\" (click)=\"createListFunction()\">Save</button>\n\t\t\t\t\t\t<button  type=\"button\" class=\"btn btn-secondary btn-sm\">Cancel</button>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div>\n\n\t\t\t</div>\n\n\t\t</div>\n\n\t\t<!--  \n      <div class=\"col-12 col-sm-8 col-md-8 chat\">\n        <div class=\"chat-header clearfix mobileMenu\" *ngIf=\"receiverName\">\n          <first-char [name]=\"receiverName\" [userBg]=\"'blue'\" [userColor]=\"'white'\" (notify)=\"showUserName($event)\"></first-char>\n  \n          <div class=\"chat-about\">\n            <div class=\"chat-with\">Chat with {{receiverName}}</div>\n          </div>\n        </div>\n  \n        <div #scrollMe [scrollTop]=\"(scrollToChatTop)?0:scrollMe.scrollHeight\" class=\"chat-history\" *ngIf=\"receiverName\">\n  \n          <ul>\n            <li class=\"textCenter\" *ngIf=\"receiverName\">\n  \n              <span  class=\"cursorPointer\" (click)=\"loadEarlierPageOfChat()\">Load Previous Chat</span>\n  \n              <br>\n  \n              <span *ngIf=\"loadingPreviousChat == true\">Loading...</span>\n  \n            </li>\n            <li class=\"clearfix\" *ngFor=\"let message of messageList\">\n              <div class=\"message-data\" [ngClass]=\"{'align-right': message.senderId == userInfo.userId}\">\n                <span class=\"message-data-time\">{{message?.createdOn | date: 'medium' }}</span> &nbsp; &nbsp;\n                <span class=\"message-data-name floatLeft\" *ngIf=\"message.senderId != userInfo.userId\">\n                  <i class=\"fa fa-circle online\"></i> {{ message?.senderName }}</span>\n                <span class=\"message-data-name\" *ngIf=\"message.senderId == userInfo.userId\">{{ message?.senderName }}</span>\n                <i class=\"fa fa-circle me\" *ngIf=\"message.senderId == userInfo.userId\"></i>\n  \n              </div>\n              <div class=\"message\" [ngClass]=\"{'float-right other-message': message.senderId == userInfo.userId, 'my-message': message.senderId != userInfo.userId}\">\n                {{message?.message | removeSpecialCharPipe: '#' | removeSpecialCharPipe: '$'}}\n              </div>\n            </li>\n  \n          </ul>\n  \n        </div>\n        <div *ngIf=\"!receiverName\" class=\"col-sm blankContent\">\n          Click on user for start a chat!!!\n        </div>\n  \n        <div class=\"chat-message clearfix p-2\" *ngIf=\"receiverName\">\n          <textarea name=\"message-to-send\" id=\"message-to-send\" (keydown)=\"sendMessageUsingKeypress($event)\" [(ngModel)]=\"messageText\"\n            placeholder=\"Type your message\" rows=\"3\"></textarea>\n  \n          <button (click)=\"sendMessage()\">Send</button>\n  \n        </div>\n  \n      </div>-->\n\n\t</div>\n\t<!-- end chat -->\n\n</div>\n<!-- end container -->"
 
 /***/ }),
 
@@ -317,18 +425,49 @@ var ListViewComponent = /** @class */ (function () {
                 _this.listName = "";
             }
         };
+        this.showShareInputFunction = function (value) {
+            _this.showShareInput = value;
+        };
+        this.sentFriendRequest = function (listData) {
+            _this.showShareInputFunction(false);
+            if (!_this.shareEmail) {
+                _this.toastr.warning('please enter the email ');
+            }
+            else {
+                var data = {
+                    friendEmail: _this.shareEmail,
+                    userId: listData.userId,
+                    listId: listData.listId
+                };
+                _this.appService.sentFriendRequest(data)
+                    .subscribe(function (apiResponse) {
+                    if (apiResponse.status === 200) {
+                        _this.toastr.success("your Friend Request sent Successfully");
+                    }
+                    else {
+                        _this.toastr.error(apiResponse.message);
+                    }
+                }, function (err) {
+                    _this.toastr.error("some error occured");
+                });
+            }
+        };
+        this.editListInputFunction = function (value) {
+            _this.showEditInputValue = value;
+            _this.showEditedInputvalue = false;
+        };
         this.showFriendListInputFunction = function (value) {
             _this.showFriendListInput = value;
             if (value == false) {
                 _this.friendEmail = "";
             }
         };
-        this.sendFriendRequestToEmail = function () {
-            if (!_this.friendEmail) {
-                _this.toastr.warning('please enter the email ');
-            }
-            else {
-            }
+        this.showEditBoxFunction = function (index) {
+            _this.showEditBoxValue = index;
+            _this.showEditBox = true;
+        };
+        this.cancelEditBoxFunction = function () {
+            _this.showEditBox = false;
         };
         this.createListFunction = function () {
             debugger;
@@ -356,6 +495,52 @@ var ListViewComponent = /** @class */ (function () {
                     _this.toastr.error("some error occured");
                 });
             }
+        };
+        this.editListNameFunction = function (listData) {
+            debugger;
+            if (!_this.listName) {
+                _this.toastr.warning('please enter the list name');
+                //  this.toastr.error("please enter the list name")
+            }
+            else {
+                //  alert("userId"+this.userId);
+                var data = {
+                    listName: _this.listName,
+                    userId: _this.userId
+                };
+                _this.showListInputFunction(false);
+                _this.appService.createListFunction(data)
+                    .subscribe(function (apiResponse) {
+                    if (apiResponse.status === 200) {
+                        _this.toastr.success("your List Created Successfully");
+                        _this.getAllLists(_this.userId);
+                    }
+                    else {
+                        _this.toastr.error(apiResponse.message);
+                    }
+                }, function (err) {
+                    _this.toastr.error("some error occured");
+                });
+            }
+        };
+        this.deleteListNameFunction = function (listData) {
+            debugger;
+            var userId = listData.userId;
+            var listId = listData.listId;
+            _this.cancelEditBoxFunction();
+            _this.showListInputFunction(false);
+            _this.appService.deleteListFunction(userId, listId)
+                .subscribe(function (apiResponse) {
+                if (apiResponse.status === 200) {
+                    _this.toastr.success("your List Deleted Successfully");
+                    _this.getAllLists(_this.userId);
+                }
+                else {
+                    _this.toastr.error(apiResponse.message);
+                }
+            }, function (err) {
+                _this.toastr.error("some error occured");
+            });
         };
         this.toastr.setRootViewContainerRef(vcr);
     }
@@ -396,12 +581,14 @@ var ListViewComponent = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_ng2_toastr__ = __webpack_require__("./node_modules/ng2-toastr/ng2-toastr.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_ng2_toastr___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_ng2_toastr__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__angular_common_http__ = __webpack_require__("./node_modules/@angular/common/esm5/http.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__accept_friend_request_accept_friend_request_component__ = __webpack_require__("./src/app/todo-list/accept-friend-request/accept-friend-request.component.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
 
 
 
@@ -423,9 +610,10 @@ var TodoListModule = /** @class */ (function () {
                 __WEBPACK_IMPORTED_MODULE_6_ng2_toastr__["ToastModule"].forRoot(),
                 __WEBPACK_IMPORTED_MODULE_3__angular_router__["c" /* RouterModule */].forChild([
                     { path: 'list-view', component: __WEBPACK_IMPORTED_MODULE_2__list_view_list_view_component__["a" /* ListViewComponent */] },
+                    { path: 'acceptFriend/:friendRequestId', component: __WEBPACK_IMPORTED_MODULE_8__accept_friend_request_accept_friend_request_component__["a" /* AcceptFriendRequestComponent */] }
                 ])
             ],
-            declarations: [__WEBPACK_IMPORTED_MODULE_2__list_view_list_view_component__["a" /* ListViewComponent */]]
+            declarations: [__WEBPACK_IMPORTED_MODULE_2__list_view_list_view_component__["a" /* ListViewComponent */], __WEBPACK_IMPORTED_MODULE_8__accept_friend_request_accept_friend_request_component__["a" /* AcceptFriendRequestComponent */]]
         })
     ], TodoListModule);
     return TodoListModule;
