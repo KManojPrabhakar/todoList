@@ -164,8 +164,8 @@ var AppService = /** @class */ (function () {
     function AppService(http) {
         var _this = this;
         this.http = http;
-        this.url = 'http://localhost:3002';
-        // private url = 'http://todolist-backend.testmanoj.com';
+        // private url =  'http://localhost:3002';
+        this.url = 'http://todolist-backend.testmanoj.com';
         this.allCountryNames = 'https://restcountries.eu/rest/v2/all';
         this.countryNameUrl = 'http://country.io/names.json';
         this.countryPhoneUrl = 'http://country.io/phone.json';
